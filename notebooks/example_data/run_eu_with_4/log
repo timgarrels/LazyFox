@@ -1,0 +1,198 @@
+Starting Fox
+running fox with input /hpi/fs00/home/tim.garrels/dissect/snap_data/eu-core/email-Eu-core.txt and output eu_output/run_eu_with_4/processing a queue size of 4 and working with 4 thraads
+loading input file
+finding max node id
+building the adj list
+building vectors from sets
+graph loaded
+running with 4 threads
+beginning initialisation
+counting neighbors
+calculating CC Per node
+1 % have a cc 	2 % have a cc 	3 % have a cc 	4 % have a cc 	5 % have a cc 	6 % have a cc 	7 % have a cc 	8 % have a cc 	9 % have a cc 	10 % have a cc 	11 % have a cc 	12 % have a cc 	13 % have a cc 	14 % have a cc 	15 % have a cc 	16 % have a cc 	17 % have a cc 	18 % have a cc 	19 % have a cc 	20 % have a cc 	21 % have a cc 	22 % have a cc 	23 % have a cc 	24 % have a cc 	25 % have a cc 	26 % have a cc 	27 % have a cc 	28 % have a cc 	29 % have a cc 	30 % have a cc 	31 % have a cc 	32 % have a cc 	33 % have a cc 	34 % have a cc 	35 % have a cc 	36 % have a cc 	37 % have a cc 	38 % have a cc 	39 % have a cc 	40 % have a cc 	41 % have a cc 	42 % have a cc 	43 % have a cc 	44 % have a cc 	45 % have a cc 	46 % have a cc 	47 % have a cc 	48 % have a cc 	49 % have a cc 	50 % have a cc 	51 % have a cc 	52 % have a cc 	53 % have a cc 	54 % have a cc 	55 % have a cc 	56 % have a cc 	57 % have a cc 	58 % have a cc 	59 % have a cc 	60 % have a cc 	61 % have a cc 	62 % have a cc 	63 % have a cc 	64 % have a cc 	65 % have a cc 	66 % have a cc 	67 % have a cc 	68 % have a cc 	69 % have a cc 	70 % have a cc 	71 % have a cc 	72 % have a cc 	73 % have a cc 	74 % have a cc 	75 % have a cc 	76 % have a cc 	77 % have a cc 	78 % have a cc 	79 % have a cc 	80 % have a cc 	81 % have a cc 	82 % have a cc 	83 % have a cc 	84 % have a cc 	85 % have a cc 	86 % have a cc 	87 % have a cc 	88 % have a cc 	89 % have a cc 	90 % have a cc 	91 % have a cc 	92 % have a cc 	93 % have a cc 	94 % have a cc 	95 % have a cc 	96 % have a cc 	97 % have a cc 	98 % have a cc 	99 % have a cc 	100 % have a cc 	done
+ordering notes
+computing CC Global
+CC Global: 0.399355
+initial clustering
+initial clusterial produced 404 communities
+initial clustering maps
+finished the hashmap population
+global WCC
+initialization done
+cleaning broken communities
+starting the main loop
+0.01 is the threshold
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) iteration 0 done
+numberStays 291
+numberLeaves 3
+numberCopies 676
+numberTransfers 23
+relative change1.4895
+epoch took 0.0475879s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) iteration 1 done
+numberStays 348
+numberLeaves 55
+numberCopies 534
+numberTransfers 60
+relative change0.588701
+epoch took 0.0814005s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) iteration 2 done
+numberStays 448
+numberLeaves 60
+numberCopies 445
+numberTransfers 49
+relative change0.329761
+epoch took 0.119929s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 86.1%} [##################################      ] (0.2s < 0.0s) iteration 3 done
+numberStays 504
+numberLeaves 58
+numberCopies 410
+numberTransfers 29
+relative change0.220982
+epoch took 0.15999s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 77.3%} [###############################         ] (0.2s < 0.0s) iteration 4 done
+numberStays 565
+numberLeaves 55
+numberCopies 365
+numberTransfers 16
+relative change0.130404
+epoch took 0.200917s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 69.7%} [############################            ] (0.2s < 0.1s) iteration 5 done
+numberStays 607
+numberLeaves 53
+numberCopies 316
+numberTransfers 24
+relative change0.0917091
+epoch took 0.250117s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 62.9%} [#########################               ] (0.2s < 0.1s) iteration 6 done
+numberStays 619
+numberLeaves 61
+numberCopies 281
+numberTransfers 38
+relative change0.0846868
+epoch took 0.288059s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 56.6%} [#######################                 ] (0.2s < 0.1s) Processing Chunk { 86.5%} [###################################     ] (0.3s < 0.0s) iteration 7 done
+numberStays 642
+numberLeaves 43
+numberCopies 289
+numberTransfers 25
+relative change0.0745422
+epoch took 0.316425s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 55.0%} [######################                  ] (0.2s < 0.1s) Processing Chunk { 85.3%} [##################################      ] (0.3s < 0.1s) iteration 8 done
+numberStays 681
+numberLeaves 40
+numberCopies 260
+numberTransfers 20
+relative change0.0612561
+epoch took 0.32638s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 55.4%} [######################                  ] (0.2s < 0.1s) Processing Chunk { 86.1%} [##################################      ] (0.3s < 0.0s) iteration 9 done
+numberStays 725
+numberLeaves 32
+numberCopies 226
+numberTransfers 15
+relative change0.0445714
+epoch took 0.319104s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 55.8%} [######################                  ] (0.2s < 0.1s) iteration 10 done
+numberStays 735
+numberLeaves 39
+numberCopies 222
+numberTransfers 4
+relative change0.0300526
+epoch took 0.297348s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 61.8%} [#########################               ] (0.2s < 0.1s) iteration 11 done
+numberStays 740
+numberLeaves 29
+numberCopies 219
+numberTransfers 14
+relative change0.0313484
+epoch took 0.266073s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 60.6%} [########################                ] (0.2s < 0.1s) iteration 12 done
+numberStays 760
+numberLeaves 33
+numberCopies 201
+numberTransfers 6
+relative change0.0301237
+epoch took 0.27326s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 42.6%} [#################                       ] (0.2s < 0.2s) Processing Chunk { 72.5%} [#############################           ] (0.3s < 0.1s) iteration 13 done
+numberStays 765
+numberLeaves 33
+numberCopies 193
+numberTransfers 8
+relative change0.0265756
+epoch took 0.415938s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 39.4%} [################                        ] (0.2s < 0.2s) Processing Chunk { 67.7%} [###########################             ] (0.3s < 0.1s) Processing Chunk { 97.6%} [####################################### ] (0.5s < 0.0s) iteration 14 done
+numberStays 822
+numberLeaves 27
+numberCopies 150
+numberTransfers 5
+relative change0.0180054
+epoch took 0.453041s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 37.8%} [###############                         ] (0.2s < 0.2s) Processing Chunk { 66.1%} [##########################              ] (0.3s < 0.2s) Processing Chunk { 97.2%} [####################################### ] (0.5s < 0.0s) iteration 15 done
+numberStays 827
+numberLeaves 25
+numberCopies 149
+numberTransfers 3
+relative change0.0160773
+epoch took 0.455419s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 40.6%} [################                        ] (0.2s < 0.2s) Processing Chunk { 72.5%} [#############################           ] (0.3s < 0.1s) iteration 16 done
+numberStays 831
+numberLeaves 23
+numberCopies 143
+numberTransfers 1
+relative change0.0136541
+epoch took 0.405773s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 43.4%} [#################                       ] (0.2s < 0.2s) Processing Chunk { 75.7%} [##############################          ] (0.3s < 0.1s) iteration 17 done
+numberStays 836
+numberLeaves 31
+numberCopies 125
+numberTransfers 7
+relative change0.01237
+epoch took 0.389878s
+dumping results...
+results dumped successfully
+Processing Chunk {  0.0%} [                                        ] (0.0s < infs) Processing Chunk { 42.2%} [#################                       ] (0.2s < 0.2s) Processing Chunk { 74.1%} [##############################          ] (0.3s < 0.1s) iteration 18 done
+numberStays 873
+numberLeaves 21
+numberCopies 103
+numberTransfers 5
+relative change0.00974029
+epoch took 0.400615s
+dumping results...
+results dumped successfully
+postprocessing still due
+finished computation at Fri Aug  6 13:54:44 2021
+elapsed time: 5.66907s
