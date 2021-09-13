@@ -1,0 +1,8 @@
+FOX
+cmake-build-debug
+.idea
+notebooks/output/**
+notebooks/datasets/**
+notebooks/.ipynb_checkpoints
+**/__pycache__
+notebooks/example_data/**/*rewritten*
