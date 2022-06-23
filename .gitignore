@@ -6,3 +6,9 @@ notebooks/datasets/**
 notebooks/.ipynb_checkpoints
 **/__pycache__
 notebooks/example_data/**/*rewritten*
+
+CMakeCache.txt
+CMakeFiles/
+LazyFox
+Makefile
+cmake_install.cmake

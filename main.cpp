@@ -96,6 +96,43 @@ ostream &operator<<(ostream &os, const ChangeCounter &cc) {
     return os;
 }
 
+class ClusteringLoader {
+    private:
+        fs::path filelocation;
+
+    public:
+        vector<vector<int>> clustering;
+        int maximumCommunityId;
+    ClusteringLoader(fs::path input) {
+        this->filelocation = std::move(input);
+        this->init();
+    }
+
+    void init() {
+        std::ifstream infile(this->filelocation);
+        if (!infile.good()) throw invalid_argument("clustering file does not exist");
+        string line;
+        stringstream line2;
+        clustering = vector<vector<int>>();
+        int a;
+        vector<int> b = vector<int>();
+
+        while (getline(infile, line)) {
+            line2.clear();
+            b.clear();
+            line2 << line;
+            line2 >> a;
+            b.push_back(a);
+            clustering.push_back(b);
+        }
+        int maximumCommunityId = -1;
+        for(auto &a: clustering){
+            maximumCommunityId = std::max(maximumCommunityId, a[0]);
+        }
+        this->maximumCommunityId = maximumCommunityId;
+    }
+};
+
 class GraphLoader {
 private:
     fs::path filelocation;
@@ -191,6 +228,10 @@ public:
         return accumulate(this->ccPerNode.begin(), this->ccPerNode.end(), 0.0f) / (float) this->numberNodes;
     }
 
+    string getResultPath() {
+        return this->iterationDumpDir / (to_string(this->iterationCount) + "clusters.txt");
+    }
+
     void initializeCluster() {
         /**
          * Apply a primitive initial clustering
@@ -211,7 +252,6 @@ public:
             }
         }
         this->maximumCommunityId = maxCommunityId;
-        cout << "initial clustering produced " << maximumCommunityId + 1 << " communities" << endl;
     }
 
     void removeSingleNodeCommunity(int communityId) {
@@ -239,7 +279,7 @@ public:
     }
 
     Fox(const string& inputFilePath, const string& outputDir, float threshold = 0.01, int queueSize = 1, int threadCount = 1,
-        bool dumpResults = true) {
+        bool dumpResults = true, bool clustering = true, string clustering_path = "") {
         this->dumpResults = dumpResults;
         this->inputFilePath = fs::path(inputFilePath);
         this->outputDir = fs::path(outputDir);
@@ -277,8 +317,17 @@ public:
         cout << "computing CC Global" << endl;
         this->cc = calculateGlobalCC();
         cout << "CC Global: " << this->cc << endl;
-        cout << "initial clustering" << endl;
-        initializeCluster();
+
+        if (clustering) {
+            cout << "initial clustering" << endl;
+            initializeCluster();
+        } else {
+            cout << "loading external clustering" << endl;
+            ClusteringLoader loader = ClusteringLoader(fs::path(clustering_path));
+            this->hashmapNC = loader.clustering;
+            this->maximumCommunityId = loader.maximumCommunityId;
+        }
+        cout << "initial clustering produced " << this->maximumCommunityId + 1 << " communities" << endl;
         cout << "initial clustering maps" << endl;
         initializeClusterMaps();
         cout << "global WCC" << endl;
@@ -486,7 +535,7 @@ public:
 
             float relativeChange = ((float) this->wccDiff) / (float) this->globalWcc;
             this->globalWcc += this->wccDiff;
-            cout << "relative change" << relativeChange << endl;
+            cout << "relative change " << relativeChange << endl;
 
             auto end = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed_seconds = end - start;
@@ -501,10 +550,6 @@ public:
             if (relativeChange < threshold) break;
             this->iterationCount++;
         }
-    }
-
-    void postProcess() {
-        cout << "postprocessing still due" << endl;
     }
 
     float calculateWccDach(int nodeId, const map<int, float> &community) {
@@ -648,7 +693,7 @@ int main(int argc, char *argv[]) {
     auto start = std::chrono::system_clock::now();
 
     if (argc < 2) {
-        cout << "usage: ./LazyFOX input_graph output_directory [queue_size] [thread_count] [dumping {0,1}]\n"
+        cout << "usage: ./LazyFOX input_graph output_directory [queue_size] [thread_count] [dumping={0,1}] [clustering={0,1} path_to_clustering] [post-processing={0,1}  path_to_post_processor]\n"
                 "\n"
                 "Run the LazyFOX algorithm\n"
                 "\n"
@@ -659,7 +704,9 @@ int main(int argc, char *argv[]) {
                 "optional arguments:\n"
                 "  queue_size          Specify the degree of parallel processing\n"
                 "  thread_count        Specify how many threads to use. Should be below or equal to queue_size\n"
-                "  dumping             If set to 0, LazyFOX will not save clustering results to disk." << endl;
+                "  dumping             If set to 0, LazyFOX will not save clustering results to disk\n"
+                "  clustering          If set to 0, LazyFOX will use an external clustering.\n"
+                "  post-processing     If set to 0, LazyFOX will use an external script for postprocessing "<< endl;
         return -1;
     }
 
@@ -672,14 +719,38 @@ int main(int argc, char *argv[]) {
     if (argc > 4) threadCount = stoi(argv[4]);
     bool dumping = true;
     if (argc > 5) dumping = stoi(argv[5]);
+    int arg_counter = 6;
 
+    bool clustering = true;
+    string clustering_path = "";
+    if (argc > arg_counter) {
+        clustering = stoi(argv[arg_counter]);
+        arg_counter++;
+        if (!clustering) {
+            clustering_path = argv[arg_counter];
+            arg_counter++;
+        }
+    }
+
+    bool post_processing = true;
+    string postprocessing_path = "";
+    if (argc > arg_counter) {
+        post_processing = stoi(argv[arg_counter]);
+        arg_counter++;
+        if (!post_processing) {
+            postprocessing_path = argv[arg_counter];
+            arg_counter++;
+        }
+    }
 
     cout << "running lazyfox with input " << input << " and output " << output << "processing a queue size of " << qSize
-         << " and working with " << threadCount << " threads" << std::endl;
+         << " and working with " << threadCount << " threads" << endl;
     cout << "dumping is " << (dumping ? "enabled" : "disabled") << endl;
-    auto fox = Fox(input, output, 0.01, qSize, threadCount, dumping);
+    cout << "clustering is " << (clustering ? "enabled": "loaded from ") << clustering_path << endl;
+    cout << "postprocessing is " << (post_processing ? "skipped": "external using ") << postprocessing_path << endl;
+    auto fox = Fox(input, output, 0.01, qSize, threadCount, dumping, clustering, clustering_path);
+
     fox.run();
-    fox.postProcess();
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
@@ -687,5 +758,12 @@ int main(int argc, char *argv[]) {
 
     std::cout << "finished computation at " << std::ctime(&end_time)
               << "elapsed time: " << elapsed_seconds.count() << "s" << endl;
+    if (!post_processing) {
+        std::cout << "Starting external processing";
+        string final_result_path = fox.getResultPath();
+        string command = postprocessing_path + " \"" + final_result_path + "\"";
+        std::cout << "Calling " << command;
+        system(command.c_str());
+    }
     return 0;
 }
