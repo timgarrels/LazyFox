@@ -51,7 +51,10 @@ arguments:
 optional arguments:
   queue_size          Specify the degree of parallel processing
   thread_count        Specify how many threads to use. Should be below or equal to queue_size
-  dumping             If set to 0, LazyFox will not save clustering results to disk.
+  dumping             If set to 0, LazyFox will not save clusterToNode results to disk.
+  clustering          If set to 0, LazyFOX will use an external clustering. If this option is used, provide the filename of the clustering behind.
+                      Every line of the file is assumed to consist of cluster_id node_id node_id node_id ... and no node_id can be present in multiple initial clusters.
+  post-processing     If set to 0, LazyFOX will use an external script for postprocessing. If this option is used, provide the script path and paramters behind, lazy fox will invoke the script by adding the resulting file path behind.
 ```
 
 
@@ -65,6 +68,10 @@ $ python3 download.py --dataset dblp --output datasets
 $ chmod +x LazyFox
 # Run LazyFox on the dblp graph, save the results to the 'output/' directory using a queue size of 2 and a thread count of 2
 $ ./LazyFox datasets/com-dblp.ungraph.txt output 2 2
+# Run LazyFox on the dblp graph, save the results to the 'output/' directory using a queue size of 2 and a thread count of 2, enabled dumping and an (initiaal) clustering from the file cluster_dblp.txt and no external postprocessing
+$ ./LazyFox datasets/email-Eu-core.txt output 2 2 1 0 data/cluster_dblp.txt
+# Run LazyFox on the dblp graph, save the results to the 'output/' directory using a queue size of 2 and a thread count of 2, enabled dumping, the internal clustering algorithm and invoke the user provided evaluate.py with the result file name as parameter once the algorithm has run completely.
+$ ./LazyFox datasets/email-Eu-core.txt output 2 2 1 1 0 evaluate.py
 ```
 
 [1] https://www.researchgate.net/publication/343408917_FOX_Fast_Overlapping_Community_Detection_Algorithm_in_Big_Weighted_Networks
