@@ -1,6 +1,7 @@
 # LazyFox: Fast and parallelized overlapping community detection in large graphs
 
 LazyFox is a parallelization enabled implementation of the Fox algorithm presented by Lyu et al. [1]
+It allows overlapping community detection in very large graph datasets with billions of edges.
 
 ## Requirements
 The LazyFox release binary has no external requirements.
