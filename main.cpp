@@ -332,7 +332,7 @@ public:
         countNeighborsPerNode();
         cout << "calculating CC Per node" << endl;
         calculateCCPerNode();
-        cout << "ordering notes" << endl;
+        cout << "ordering nodes" << endl;
         orderNodes();
 
         cout << "computing CC Global" << endl;
@@ -684,13 +684,8 @@ public:
         // calculate cc per node once
         this->ccPerNode.resize(numberNodes);
         int nodeId;
-        int tmp = 0;
-#pragma omp parallel for default(none) num_threads(this->threadCount) private(nodeId) shared(cout, tmp)
+#pragma omp parallel for default(none) num_threads(this->threadCount) private(nodeId)
         for (nodeId = numberNodes - 1; nodeId >= 0; nodeId--) {
-            tmp++;
-            if (tmp % (numberNodes / 100) == 0) {
-                cout << tmp / (numberNodes / 100) << " % have a cc \t\r" << flush;
-            }
 
             if (numberNeighbors[nodeId] <= 1) {
                 this->ccPerNode[nodeId] = 0;
@@ -707,7 +702,6 @@ public:
             this->ccPerNode[nodeId] = ((float) k /
                                        ((float) numberNeighbors[nodeId] * (float) (numberNeighbors[nodeId] - 1)));
         }
-        cout << "done" << endl;
     }
 };
 
