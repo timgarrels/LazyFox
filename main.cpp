@@ -566,6 +566,7 @@ public:
                 cout << "results dumped successfully" << endl;
             }
 
+            if (changeCounter.numberStays == this->numberNodes) break;
             if (relativeChange < threshold) break;
             this->iterationCount++;
         }
