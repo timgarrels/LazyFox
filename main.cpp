@@ -101,7 +101,6 @@ private:
     fs::path filelocation;
 
 public:
-    vector<vector<int>> clusterToNode;
     vector<vector<int>> nodeToCluster;
     int maximumCommunityId;
     int num_nodes;
@@ -117,7 +116,6 @@ public:
         if (!infile.good()) throw invalid_argument("clustering file does not exist");
         string line;
         stringstream linestream;
-        clusterToNode = vector<vector<int>>();
         nodeToCluster = vector<vector<int>>();
         // prepopulate with empty lists
         for (int i = 0; i < this->num_nodes; i++) {
@@ -138,18 +136,16 @@ public:
                 node_ids.push_back(nodeId);
                 this->nodeToCluster[nodeId].push_back(communityId);
             }
-            this->clusterToNode.push_back(node_ids);
         }
         this->maximumCommunityId = _maxCommunityId;
-        /*
-        // check that every node has exactly one community
-        for (int i = 0; i < this->num_nodes; i++) {
-            if (this->nodeToCluster[i].size() != 1) {
-                cout << "illegal state! node " << i << " has " << this->nodeToCluster[i].size() << " clusters" << endl;
-                // throw invalid_argument("node " + i + " has "+ this->nodeToCluster[i].size() + "clusters instead of the one allowed" );
+        // For each node not mentioned in pre-clustering, create a single node community with that node
+        int singleNodeCommunityId = this->maximumCommunityId + 1;
+        for (int nodeId = 0; nodeId < this->num_nodes; nodeId++) {
+            if (this->nodeToCluster[nodeId].empty()) {
+                this->nodeToCluster[nodeId].push_back(singleNodeCommunityId);
+                singleNodeCommunityId++;
             }
         }
-         */
     }
 };
 
