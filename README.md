@@ -1,32 +1,114 @@
 # LazyFox: Fast and parallelized overlapping community detection in large graphs
 
-LazyFox is a parallelization enabled implementation of the Fox algorithm presented by Lyu et al. [1]
+[LazyFox](https://arxiv.org/abs/2210.03211) is a parallelization enabled implementation of the 
+[FOX algorithm](https://www.researchgate.net/publication/343408917_FOX_Fast_Overlapping_Community_Detection_Algorithm_in_Big_Weighted_Networks) presented by Lyu et al.
 
-It allows overlapping community detection in very large graph datasets with billions of edges.
-
+It allows overlapping community detection in very large graph datasets with billions of edges by optimizing a WCC estimation.
 ## Requirements
 The LazyFox release binary has no external requirements.
 
-To run the python code and notebooks you will need to have the following packages:
+To run the python code and notebooks require the following packages:
 - pandas
 - matplotlib
-- [networkit](https://github.com/networkit/networkit) (you need to have cmake, a c++ compiler and Cython installed)
+- networkit (cmake, a c++ compiler and Cython required)
 - jupyter (to run the notebooks)
 
-## Usage
+## Quick Start
+```bash
+# Download the DBLP dataset to the 'datasets/' directory
+$ python3 download.py --dataset dblp --output datasets
+# Make the LazyFox binary executable
+$ chmod +x LazyFox
+# Run LazyFox on the dblp graph, save the results to the 'output/' directory using a queue size of 2 and a thread count of 2
+$ ./LazyFox --input-graph datasets/com-dblp.ungraph.txt --output-dir output --queue-size 2 --thread-count 2
+```
 
-For a detailed step by step usage guide, refer to the jupyter notebooks in `notebooks/`.
+## Overview
+The following section describes which input formats LazyFox accepts and how to interpret the output.
 
-Quick Instructions:
+### Usage
+For a detailed step-by-step usage guide, refer to the jupyter notebooks in `notebooks/`.
+```
+Run the LazyFox algorithm
 
-1. Download the latest release of LazyFox or compile it yourself.
-2. Download a dataset to run on. In our project we used 
-[Eu-core](https://snap.stanford.edu/data/email-Eu-core.html),
-[DBLP](https://snap.stanford.edu/data/com-DBLP.html),
-[LiveJournal](https://snap.stanford.edu/data/com-LiveJournal.html) and the
-[Friendster](https://snap.stanford.edu/data/com-Friendster.html) datasets provided by the SNAP group.
+Overlapping community detection for very large graph datasets with billions of edgesby optimizing a WCC estimation.
 
-You can use the `download.py` utility script for downloading them:
+usage: LazyFox --input-graph <dataset path> --output-dir <output directory>
+usage: LazyFox --input-graph <dataset path> --output-dir <output directory> --queue-size 64 --thread-count 64
+usage: LazyFox --input-graph <dataset path> --output-dir <output directory> --wcc-threshold 0.05
+usage: LazyFox --input-graph <dataset path> --output-dir <output directory> --pre-clustering <clustering path> --post-processing <script path>
+
+Required Arguments:
+  --input-graph <file_path>         File containing the graph dataset as an edge list
+  --output-dir <directory>          Output directory, a subdirectory will be created for each run
+
+Optional Arguments:
+  --queue-size <int>                The degree of parallel processing (default=1)
+  --thread-count <int>              How many threads to use. Should be below or equal to queue_size (default=1)
+  --wcc-threshold <float>           Threshold in wcc-change to stop processing (default=0.01)
+  --disable-dumping                 LazyFox will not save clustering results to disk
+  --pre-clustering <file_path>      Loads external node clustering, replacing initial clustering algorithm
+  --post-processing <script_path>   Script will be called after LazyFox clustering, with the run-subdirectory as argument
+```
+
+### Graph Input
+LazyFox takes an edge list representing the initial graph as input file:
+```
+# Edge List for the following graph:
+#    1     4     7
+#  /   \ /   \ /   \
+# 0     3     6     9
+#  \   / \   / \   /
+#    2     5     8
+# 
+# SourceNode	TargetNode
+0   1
+0   2
+1   3
+2   3
+3   4
+3   5
+4   6
+5   6
+6   7
+6   8
+7   9
+8   9
+```
+Each line contains one edge, consisting of the source node and target node, separated by a space or a tab.
+The graph is undirected, therefore a single declaration of an edge is sufficient
+(if node 0 and 1 are connected, only the line `0 1` is necessary, `1 0` is not).
+
+### Pre-Clustering
+LazyFox can work starting from a pre-existing node clustering. A pre-clustering can be supplied with the `--pre-clustering` argument: 
+```
+# Pre-Clustering for the nodes 3, 4, 5, and 6 of the graph above
+3 4 5 6
+```
+The supplied file should contain one community per line, listing all nodes of that community in that line, separated by spaces or tabs.
+Each node not mentioned in the pre-clustering is assumed to be a member of a single node community.
+
+### Output
+
+The output directory of LazyFox looks like this:
+```
+[output_directory]
+    > CPP_[dataset_name]_[Timestamp]
+        > iterations
+            > 0.json
+            > 0clusters.txt
+            > 1.json
+            > 1clusters.txt
+            > 2.json
+            > 2clusters.txt
+            > ...
+```
+The number in the filename states the iteration. `0.json` describes meta-information about the result of iteration 0, while `0clusters.txt` lists the generated communities in that run.
+The `json` file lists the iterations runtime, wcc-scores per community, and the node changes performed during the iteration.
+The `txt` file lists one community per line, each line containing the node ids for that community.
+
+### Download Utility
+You can use the `download.py` utility script to download the SNAP group datasets we used:
 ```
 usage: download.py [-h] --dataset {eu,dblp,lj} --output OUTPUT
 
@@ -39,41 +121,3 @@ arguments:
   --output OUTPUT       The directory to download to
 ```
 (Note that we do not provide automated download of the Friendster dataset due to its size.)
-
-3. Run LazyFox from the commandline using:
-```
-usage: ./LazyFox input_graph output_directory [queue_size] [thread_count] [dumping {0,1}]
-
-Run the LazyFox algorithm
-
-arguments:
-  input_graph         File containing the dataset as an edge list
-  output_directory    Directory to log into, a subdirectory will be created for each run
-
-optional arguments:
-  queue_size          Specify the degree of parallel processing
-  thread_count        Specify how many threads to use. Should be below or equal to queue_size
-  dumping             If set to 0, LazyFox will not save clusterToNode results to disk.
-  clustering          If set to 0, LazyFOX will use an external clustering. If this option is used, provide the filename of the clustering behind.
-                      Every line of the file is assumed to consist of cluster_id node_id node_id node_id ... and no node_id can be present in multiple initial clusters.
-  post-processing     If set to 0, LazyFOX will use an external script for postprocessing. If this option is used, provide the script path and paramters behind, lazy fox will invoke the script by adding the resulting file path behind.
-```
-
-
-Be sure to have enough cores to support the specified degree of parallelization.
-
-## Example
-```bash
-# Download the DBLP dataset to the 'datasets/' directory
-$ python3 download.py --dataset dblp --output datasets
-# Make the LazyFox binary executable
-$ chmod +x LazyFox
-# Run LazyFox on the dblp graph, save the results to the 'output/' directory using a queue size of 2 and a thread count of 2
-$ ./LazyFox datasets/com-dblp.ungraph.txt output 2 2
-# Run LazyFox on the dblp graph, save the results to the 'output/' directory using a queue size of 2 and a thread count of 2, enabled dumping and an (initiaal) clustering from the file cluster_dblp.txt and no external postprocessing
-$ ./LazyFox datasets/email-Eu-core.txt output 2 2 1 0 data/cluster_dblp.txt
-# Run LazyFox on the dblp graph, save the results to the 'output/' directory using a queue size of 2 and a thread count of 2, enabled dumping, the internal clustering algorithm and invoke the user provided evaluate.py with the result file name as parameter once the algorithm has run completely.
-$ ./LazyFox datasets/email-Eu-core.txt output 2 2 1 1 0 evaluate.py
-```
-
-[1] https://www.researchgate.net/publication/343408917_FOX_Fast_Overlapping_Community_Detection_Algorithm_in_Big_Weighted_Networks
