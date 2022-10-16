@@ -126,6 +126,7 @@ public:
 
         int communityId = 0;
         while (getline(infile, line)) {
+            if (line.starts_with("#")) continue;
             linestream.clear();
             node_ids.clear();
             linestream << line;
@@ -732,7 +733,7 @@ int main(int argc, char *argv[]) {
     InputParser input(argc, argv);
     if(input.cmdOptionExists("-h") || argc <= 2) {
         cout
-                << "Run the LazyFOX algorithm\n\n"
+                << "Run the LazyFox algorithm\n\n"
                    "Overlapping community detection for very large graph datasets with billions of edges"
                    "by optimizing a WCC estimation.\n\n"
                    "usage: LazyFox --input-graph <dataset path> --output-dir <output directory>\n"
@@ -748,9 +749,9 @@ int main(int argc, char *argv[]) {
                    "  --queue-size <int>                The degree of parallel processing (default=1)\n"
                    "  --thread-count <int>              How many threads to use. Should be below or equal to queue_size (default=1)\n"
                    "  --wcc-threshold <float>           Threshold in wcc-change to stop processing (default=0.01)\n"
-                   "  --disable-dumping                 LazyFOX will not save clustering results to disk\n"
+                   "  --disable-dumping                 LazyFox will not save clustering results to disk\n"
                    "  --pre-clustering <file_path>      Loads external node clustering, replacing initial clustering algorithm\n"
-                   "  --post-processing <script_path>   Script will be called after LazyFOX clustering, with the run-subdirectory as argument" << endl;
+                   "  --post-processing <script_path>   Script will be called after LazyFox clustering, with the run-subdirectory as argument" << endl;
         return -1;
     }
     cout << "Starting LazyFox" << std::endl;
