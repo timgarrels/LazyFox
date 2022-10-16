@@ -90,22 +90,39 @@ Each node not mentioned in the pre-clustering is assumed to be a member of a sin
 
 ### Output
 
-The output directory of LazyFox looks like this:
+The output directory of LazyFox for the above example looks like this:
 ```
 [output_directory]
     > CPP_[dataset_name]_[Timestamp]
         > iterations
             > 0.json
             > 0clusters.txt
-            > 1.json
-            > 1clusters.txt
-            > 2.json
-            > 2clusters.txt
-            > ...
 ```
 The number in the filename states the iteration. `0.json` describes meta-information about the result of iteration 0, while `0clusters.txt` lists the generated communities in that run.
+```
+# 0.json
+{
+    "change_counter": {
+        "copy": 0,
+        "leave": 0,
+        "stay": 10,
+        "transfer": 0
+    },
+    "iteration": 0,
+    "runtime": 7.5735e-05,
+    "wcc_lookup": {
+        "0": null
+    }
+}
+```
+```
+# 0clusters.txt
+3	4	5	6
+```
 The `json` file lists the iterations runtime, wcc-scores per community, and the node changes performed during the iteration.
 The `txt` file lists one community per line, each line containing the node ids for that community.
+
+Due to the small size of this example, the original community was preserved by LazyFox. Larger graphs will result in multiple iterations and multiple `json` and `txt` files.
 
 ### Download Utility
 You can use the `download.py` utility script to download the SNAP group datasets we used:
