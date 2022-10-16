@@ -122,31 +122,28 @@ public:
         for (int i = 0; i < this->num_nodes; i++) {
             nodeToCluster.emplace_back();
         }
-        int communityId;
         vector<int> node_ids = vector<int>();
-        int _maxCommunityId = -1;
 
+        int communityId = 0;
         while (getline(infile, line)) {
             linestream.clear();
             node_ids.clear();
             linestream << line;
             // lines read as cluster_id node_id node_id
-            linestream >> communityId;
-            _maxCommunityId = max(communityId, _maxCommunityId);
             for (int nodeId; linestream >> nodeId;) {
                 node_ids.push_back(nodeId);
                 this->nodeToCluster[nodeId].push_back(communityId);
             }
+            communityId++;
         }
-        this->maximumCommunityId = _maxCommunityId;
         // For each node not mentioned in pre-clustering, create a single node community with that node
-        int singleNodeCommunityId = this->maximumCommunityId + 1;
         for (int nodeId = 0; nodeId < this->num_nodes; nodeId++) {
             if (this->nodeToCluster[nodeId].empty()) {
-                this->nodeToCluster[nodeId].push_back(singleNodeCommunityId);
-                singleNodeCommunityId++;
+                this->nodeToCluster[nodeId].push_back(communityId);
+                communityId++;
             }
         }
+        this->maximumCommunityId = communityId - 1;
     }
 };
 
