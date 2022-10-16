@@ -559,14 +559,15 @@ public:
             std::chrono::duration<double> elapsed_seconds = end - start;
             cout << "epoch took " << elapsed_seconds.count() << "s" << endl;
 
-            if (this->dumpResults) {
+            bool done = (changeCounter.numberStays == this->numberNodes) || (relativeChange < threshold);
+
+            if (this->dumpResults || done) {
                 cout << "dumping results..." << endl;
                 this->dumpResultsToFile(changeCounter, elapsed_seconds.count());
                 cout << "results dumped successfully" << endl;
             }
 
-            if (changeCounter.numberStays == this->numberNodes) break;
-            if (relativeChange < threshold) break;
+            if (done) break;
             this->iterationCount++;
         }
     }
