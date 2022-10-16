@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <filesystem>
 #include <utility>
@@ -296,7 +297,7 @@ public:
 
     Fox(const string &inputFilePath, const string &outputDir, float threshold = 0.01, int queueSize = 1,
         int threadCount = 1,
-        bool dumpResults = true, bool clustering = true, string clustering_path = "") {
+        bool dumpResults = true, string clustering_path = "") {
         this->dumpResults = dumpResults;
         this->inputFilePath = fs::path(inputFilePath);
         this->outputDir = fs::path(outputDir);
@@ -335,7 +336,7 @@ public:
         this->cc = calculateGlobalCC();
         cout << "CC Global: " << this->cc << endl;
 
-        if (clustering) {
+        if (clustering_path.empty()) {
             cout << "initial clustering" << endl;
             initializeCluster();
         } else {
@@ -702,69 +703,123 @@ public:
     }
 };
 
+/** Taken from https://stackoverflow.com/a/868894 */
+class InputParser{
+public:
+    InputParser (int &argc, char **argv){
+        for (int i=1; i < argc; ++i)
+            this->tokens.push_back(std::string(argv[i]));
+    }
+    /// @author iain
+    const std::string& getCmdOption(const std::string &option) const{
+        std::vector<std::string>::const_iterator itr;
+        itr =  std::find(this->tokens.begin(), this->tokens.end(), option);
+        if (itr != this->tokens.end() && ++itr != this->tokens.end()){
+            return *itr;
+        }
+        static const std::string empty_string("");
+        return empty_string;
+    }
+    /// @author iain
+    bool cmdOptionExists(const std::string &option) const{
+        return std::find(this->tokens.begin(), this->tokens.end(), option)
+               != this->tokens.end();
+    }
+private:
+    std::vector <std::string> tokens;
+};
+
 int main(int argc, char *argv[]) {
-    cout << "Starting LazyFox" << std::endl;
     auto start = std::chrono::system_clock::now();
 
-    if (argc < 3) {
+    InputParser input(argc, argv);
+    if(input.cmdOptionExists("-h") || argc <= 2) {
         cout
-                << "usage: ./LazyFOX input_graph output_directory [queue_size] [thread_count] [dumping={0,1}] [clustering={0,1} path_to_clustering] [post-processing={0,1}  path_to_post_processor]\n"
+                << "Run the LazyFOX algorithm\n\n"
+                   "Overlapping community detection for very large graph datasets with billions of edges"
+                   "by optimizing a WCC estimation.\n\n"
+                   "usage: LazyFox --input-graph <dataset path> --output-dir <output directory>\n"
+                   "usage: LazyFox --input-graph <dataset path> --output-dir <output directory> --queue-size 64 --thread-count 64\n"
+                   "usage: LazyFox --input-graph <dataset path> --output-dir <output directory> --wcc-threshold 0.05\n"
+                   "usage: LazyFox --input-graph <dataset path> --output-dir <output directory> --pre-clustering <clustering path> --post-processing <script path>\n"
                    "\n"
-                   "Run the LazyFOX algorithm\n"
+                   "Required Arguments:\n"
+                   "  --input-graph <file_path>         File containing the graph dataset as an edge list\n"
+                   "  --output-dir <directory>          Output directory, a subdirectory will be created for each run\n"
                    "\n"
-                   "arguments:\n"
-                   "  input_graph         File containing the dataset as an edge list\n"
-                   "  output_directory    Directory to log into, a subdirectory will be created for each run\n"
-                   "\n"
-                   "optional arguments:\n"
-                   "  queue_size          Specify the degree of parallel processing\n"
-                   "  thread_count        Specify how many threads to use. Should be below or equal to queue_size\n"
-                   "  dumping             If set to 0, LazyFOX will not save clustering results to disk\n"
-                   "  clustering          If set to 0, LazyFOX will use an external clustering.\n"
-                   "  post-processing     If set to 0, LazyFOX will use an external script for postprocessing " << endl;
+                   "Optional Arguments:\n"
+                   "  --queue-size <int>                The degree of parallel processing (default=1)\n"
+                   "  --thread-count <int>              How many threads to use. Should be below or equal to queue_size (default=1)\n"
+                   "  --wcc-threshold <float>           Threshold in wcc-change to stop processing (default=0.01)\n"
+                   "  --disable-dumping                 LazyFOX will not save clustering results to disk\n"
+                   "  --pre-clustering <file_path>      Loads external node clustering, replacing initial clustering algorithm\n"
+                   "  --post-processing <script_path>   Script will be called after LazyFOX clustering, with the run-subdirectory as argument" << endl;
         return -1;
     }
+    cout << "Starting LazyFox" << std::endl;
 
-    string input = argv[1];
-    string output = argv[2];
+    const std::string &inputGraph = input.getCmdOption("--input-graph");
+    const std::string &outputDir = input.getCmdOption("--output-dir");
+
+    if (inputGraph.empty()) {
+        cout << "No --input-graph specified!" << endl;
+        return -1;
+    } else {
+        cout << "Loading input graph from " << inputGraph << endl;
+    }
+    if (outputDir.empty()) {
+        cout << "No --output-dir specified!" << endl;
+        return -1;
+    } else {
+        cout << "Writing output to " << outputDir << endl;
+    }
+
+    float wccThreshold = 0.01;
+    const string &wccThresholdInput = input.getCmdOption("--wcc-threshold");
+    if (!wccThresholdInput.empty()) {
+        wccThreshold = stof(wccThresholdInput);
+    }
+    cout << "WCC threshold set to " << wccThreshold << endl;
 
     int threadCount = 1;
+    const string &threadCountInput = input.getCmdOption("--thread-count");
+    if (!threadCountInput.empty()) {
+        threadCount = stoi(threadCountInput);
+    }
+    cout << "Thread count set to " << threadCount << endl;
+
     int qSize = 1;
-    if (argc > 3) qSize = stoi(argv[3]);
-    if (argc > 4) threadCount = stoi(argv[4]);
+    const std::string &qSizeInput = input.getCmdOption("--queue-size");
+    if (!qSizeInput.empty()) {
+        qSize = stoi(qSizeInput);
+    }
+    cout << "Queues size set to " << qSize << endl;
+
     bool dumping = true;
-    if (argc > 5) dumping = stoi(argv[5]);
-    int arg_counter = 6;
+    if (input.cmdOptionExists("--disable-dumping")){
+        dumping = false;
+    }
+    cout << "Dumping set to " << (dumping ? "true" : "false") << endl;
 
-    bool clustering = true;
-    string clustering_path;
-    if (argc > arg_counter) {
-        clustering = stoi(argv[arg_counter]);
-        arg_counter++;
-        if (!clustering) {
-            clustering_path = argv[arg_counter];
-            arg_counter++;
-        }
+
+    const std::string &preClusteringPath = input.getCmdOption("--pre-clustering");
+    if (!preClusteringPath.empty()) {
+        cout << "Loading pre-clustering from " << preClusteringPath << endl;
+    }
+    const std::string &postProcessingPath = input.getCmdOption("--post-processing");
+    if (!postProcessingPath.empty()) {
+        cout << "Post processing script enabled: " << postProcessingPath << endl;
     }
 
-    bool post_processing = true;
-    string postprocessing_path;
-    if (argc > arg_counter) {
-        post_processing = stoi(argv[arg_counter]);
-        arg_counter++;
-        if (!post_processing) {
-            postprocessing_path = argv[arg_counter];
-            arg_counter++;
-        }
-    }
-
-    cout << "running lazyfox with input " << input << " and output " << output << "processing a queue size of " << qSize
-         << " and working with " << threadCount << " threads" << endl;
-    cout << "dumping is " << (dumping ? "enabled" : "disabled") << endl;
-    cout << "clustering is " << (clustering ? "enabled" : "loaded from ") << clustering_path << endl;
-    cout << "postprocessing is " << (post_processing ? "skipped" : "external using ") << postprocessing_path << endl;
-    auto fox = Fox(input, output, 0.01, qSize, threadCount, dumping, clustering, clustering_path);
-
+    auto fox = Fox(
+        inputGraph,
+        outputDir,
+        wccThreshold,
+        qSize,
+        threadCount,
+        dumping,
+        preClusteringPath
+    );
     fox.run();
 
     auto end = std::chrono::system_clock::now();
@@ -773,11 +828,11 @@ int main(int argc, char *argv[]) {
 
     std::cout << "finished computation at " << std::ctime(&end_time)
               << "elapsed time: " << elapsed_seconds.count() << "s" << endl;
-    if (!post_processing) {
-        std::cout << "Starting external processing";
+    if (!postProcessingPath.empty()) {
+        std::cout << "Starting post processing\n";
         string final_result_path = fox.getResultPath();
-        string command = postprocessing_path + " \"" + final_result_path + "\"";
-        std::cout << "Calling " << command;
+        string command = postProcessingPath + " \"" + final_result_path + "\"";
+        std::cout << "Calling '" << command << "'\n";
         system(command.c_str());
     }
     return 0;
