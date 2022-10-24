@@ -1,7 +1,7 @@
 # LazyFox: Fast and parallelized overlapping community detection in large graphs
 
-[LazyFox](https://arxiv.org/abs/2210.03211) is a parallelization enabled implementation of the 
-[FOX algorithm](https://www.researchgate.net/publication/343408917_FOX_Fast_Overlapping_Community_Detection_Algorithm_in_Big_Weighted_Networks) presented by Lyu et al.
+[LazyFox](https://arxiv.org/abs/2210.03211)[1] is a parallelization enabled implementation of the 
+[FOX algorithm](https://dl.acm.org/doi/10.1145/3404970) presented by Lyu et al[2].
 
 It allows overlapping community detection in very large graph datasets with billions of edges by optimizing a WCC estimation.
 ## Requirements
@@ -138,3 +138,10 @@ arguments:
   --output OUTPUT       The directory to download to
 ```
 (Note that we do not provide automated download of the Friendster dataset due to its size.)
+
+## References
+If you use LazyFox, please cite
+ 
+[1] Garrels, T., Khodabakhsh, A., Renard, B. Y. & Baum, K. LazyFox: Fast and parallelized overlapping community detection in large graphs. doi:10.48550/ARXIV.2210.03211 (2022)
+
+[2] Lyu, T., Bing, L., Zhang, Z. & Zhang, Y. FOX: Fast Overlapping Community Detection Algorithm in Big Weighted Networks. Trans. Soc. Comput. 3, Article 16, doi:10.1145/3404970 (2020)
