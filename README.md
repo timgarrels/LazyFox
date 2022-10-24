@@ -46,7 +46,7 @@ Optional Arguments:
   --queue-size <int>                The degree of parallel processing (default=1)
   --thread-count <int>              How many threads to use. Should be below or equal to queue_size (default=1)
   --wcc-threshold <float>           Threshold in wcc-change to stop processing (default=0.01)
-  --disable-dumping                 LazyFox will not save clustering results to disk
+  --disable-dumping                 LazyFox will only save the clustering results of the final iteration to disk, not intermediate results
   --pre-clustering <file_path>      Loads external node clustering, replacing initial clustering algorithm
   --post-processing <script_path>   Script will be called after LazyFox clustering, with the run-subdirectory as argument
 ```

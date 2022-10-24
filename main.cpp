@@ -750,7 +750,7 @@ int main(int argc, char *argv[]) {
                    "  --queue-size <int>                The degree of parallel processing (default=1)\n"
                    "  --thread-count <int>              How many threads to use. Should be below or equal to queue_size (default=1)\n"
                    "  --wcc-threshold <float>           Threshold in wcc-change to stop processing (default=0.01)\n"
-                   "  --disable-dumping                 LazyFox will not save clustering results to disk\n"
+                   "  --disable-dumping                 LazyFox will only save the clustering results of the final iteration to disk, not intermediate results\n"
                    "  --pre-clustering <file_path>      Loads external node clustering, replacing initial clustering algorithm\n"
                    "  --post-processing <script_path>   Script will be called after LazyFox clustering, with the run-subdirectory as argument" << endl;
         return -1;
