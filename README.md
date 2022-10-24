@@ -5,7 +5,7 @@
 
 It allows overlapping community detection in very large graph datasets with billions of edges by optimizing a WCC estimation.
 ## Requirements
-The LazyFox release binary has no external requirements.
+The LazyFox release binary has no external requirements. LazyFox can be compiled from source via cmake.
 
 To run the python code and notebooks require the following packages:
 - pandas
