@@ -4,7 +4,7 @@ from typing import Set
 import json
 
 from BenchmarkRun import BenchmarkRun
-
+from tqdm import tqdm
 
 dataset_file_names = {
     "eu": {"graph": "email-Eu-core.txt", "gt": "email-Eu-core-department-labels.txt"},
@@ -75,12 +75,12 @@ class Rewriter(object):
                     community = line.strip().split("\t")
                     gt_communities.append(community)
         return gt_communities
-        
 
     def rewrite_dataset(self, dataset):
         self.check_dataset_validity(dataset)
         
         # Load the graph from file
+        print("Loading Graph")
         node_labels, edges = self._load_graph(dataset)
 
         # nodes are not necessarily strictly ascending
@@ -91,22 +91,24 @@ class Rewriter(object):
 
         # Write graph with remapping
         with open(join(self.output_directory, f"rewritten_{dataset}_graph.txt"), "w") as f:
-            for edge in edges:
+            for edge in tqdm(edges, desc="Writing mapped edges"):
                 n1, n2 = edge
                 f.write(f"{mapping[n1]} {mapping[n2]}\n")
         
         # Load ground truth communities from file
+        print("loading gt communities")
         gt_communities = self._load_ground_truth_communities(dataset)
         
         # Write ground truth communities with remapping
         with open(join(self.output_directory, f"rewritten_{dataset}_gt.txt"), "w") as f:
-            for community in gt_communities:
+            for community in tqdm(gt_communities, desc="Rewriting Gt Communities"):
                 community = list(map(lambda n_label: str(mapping[n_label]), community))
                 f.write(" ".join(community))
                 f.write("\n")
         
         # Write mapping
         with open(join(self.output_directory, f"node_mapping_{dataset}.json"), "w") as f:
+            print("Writing Mapping")
             json.dump(mapping, f)
     
     def rewrite_lazyfox_result(self, run: BenchmarkRun, wcc_diff=0.01):
