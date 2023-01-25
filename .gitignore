@@ -1,3 +1,5 @@
+LazyFOX
+LazyFox
 FOX
 cmake-build-debug
 .idea
@@ -6,3 +8,4 @@ notebooks/datasets/**
 **/.ipynb_checkpoints
 **/__pycache__
 notebooks/example_data/**/*rewritten*
+.venv/
